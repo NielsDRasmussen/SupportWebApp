@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-
+using Newtonsoft.Json;
 namespace SupportWebApp.Models;
 
 public class SupportMessage
 {
+    [JsonProperty("id")]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     [Required(ErrorMessage = "Kategori er påkrævet")]

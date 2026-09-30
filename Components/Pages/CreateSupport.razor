@@ -1,5 +1,62 @@
-<h3>CreateSupport</h3>
+@page "/create-support"
+@rendermode InteractiveServer
+@using SupportWebApp.Models
+@using SupportWebApp.Services
+@inject CosmosDbService CosmosDb
+
+<h3>Opret supporthenvendelse</h3>
+
+<EditForm Model="@message"
+          OnValidSubmit="@CreateSupportMessage"
+          FormName="CreateSupportForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Kategori</label>
+        <InputText @bind-Value="message.Category" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Navn</label>
+        <InputText @bind-Value="message.Customer.Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText @bind-Value="message.Customer.Email" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Telefon</label>
+        <InputText @bind-Value="message.Customer.Phone" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Beskrivelse</label>
+        <InputTextArea @bind-Value="message.Description" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Opret supporthenvendelse
+    </button>
+</EditForm>
+
+@if (successMessage != null)
+{
+    <p class="text-success mt-3">@successMessage</p>
+}
 
 @code {
-    
+    private SupportMessage message = new();
+    private string? successMessage;
+
+    private async Task CreateSupportMessage()
+    {
+        await CosmosDb.AddSupportMessageAsync(message);
+
+        successMessage = "Supporthenvendelsen er oprettet.";
+
+        message = new SupportMessage();
+    }
 }
