@@ -7,51 +7,79 @@
 
 <h3>Supporthenvendelser</h3>
 
+<div class="mb-3">
+    <label for="category">Vælg kategori:</label>
+
+    <select id="category"
+            class="form-select"
+            @bind="selectedCategory"
+            @bind:after="LoadMessages">
+        <option value="Alle">Alle</option>
+        <option value="teknisk">Teknisk</option>
+        <option value="salg">Salg</option>
+        <option value="reservedele">Reservedele</option>
+        <option value="andet">Andet</option>
+    </select>
+</div>
+
 @if (messages == null)
 {
     <p>Henter supporthenvendelser...</p>
 }
 else if (messages.Count == 0)
 {
-    <p>Der er ingen supporthenvendelser.</p>
+    <p>Der er ingen supporthenvendelser i denne kategori.</p>
 }
 else
 {
     <table class="table">
         <thead>
-        <tr>
-            <th>Kategori</th>
-            <th>Kunde</th>
-            <th>Email</th>
-            <th>Telefon</th>
-            <th>Beskrivelse</th>
-            <th>Dato</th>
-            <th>Status</th>
-        </tr>
+            <tr>
+                <th>Kategori</th>
+                <th>Kunde</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>Beskrivelse</th>
+                <th>Dato</th>
+                <th>Status</th>
+            </tr>
         </thead>
 
         <tbody>
-        @foreach (var message in messages)
-        {
-            <tr>
-                <td>@message.Category</td>
-                <td>@message.Customer.Name</td>
-                <td>@message.Customer.Email</td>
-                <td>@message.Customer.Phone</td>
-                <td>@message.Description</td>
-                <td>@message.CreatedAt</td>
-                <td>@message.Status</td>
-            </tr>
-        }
+            @foreach (var message in messages)
+            {
+                <tr>
+                    <td>@message.Category</td>
+                    <td>@message.Customer.Name</td>
+                    <td>@message.Customer.Email</td>
+                    <td>@message.Customer.Phone</td>
+                    <td>@message.Description</td>
+                    <td>@message.CreatedAt</td>
+                    <td>@message.Status</td>
+                </tr>
+            }
         </tbody>
     </table>
 }
 
 @code {
     private List<SupportMessage>? messages;
+    private string selectedCategory = "Alle";
 
     protected override async Task OnInitializedAsync()
     {
-        messages = await CosmosDb.GetSupportMessagesAsync();
+        await LoadMessages();
+    }
+
+    private async Task LoadMessages()
+    {
+        if (selectedCategory == "Alle")
+        {
+            messages = await CosmosDb.GetSupportMessagesAsync();
+        }
+        else
+        {
+            messages = await CosmosDb.GetSupportMessagesByCategoryAsync(selectedCategory);
+        }
     }
 }
